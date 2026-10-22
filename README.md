@@ -1,0 +1,1 @@
+# Miniaturny-Automatizovany-Sklenik
