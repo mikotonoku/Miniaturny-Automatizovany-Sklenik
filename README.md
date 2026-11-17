@@ -13,16 +13,17 @@ STM32 meria teplotu a vlhkosť vzduchu, vlhkosť pôdy a osvetlenie. Aplikácia 
 | Čerpadlo | Zapne sa, keď vlhkosť pôdy klesne pod nastavenú hranicu. | Denný čas spustenia a dĺžka polievania. |
 | Ventilátor | Zapne sa pri prekročení nastavenej teploty. | Denný čas spustenia a dĺžka vetrania. |
 | LED | Ručné zapnutie a vypnutie v aplikácii. | Denný čas zapnutia a vypnutia. |
+| Ultrazvukový rozprašovač | Zapne sa, keď relatívna vlhkosť vzduchu klesne pod hranicu nastavenú v aplikácii. | — |
 
-Režim sa volí pre každé zariadenie zvlášť. STM32 obmedzuje dĺžku polievania a dodržiava minimálnu prestávku medzi cyklami v oboch režimoch. Aplikácia pri pripojení synchronizuje čas.
+Režim sa volí pre každé zariadenie zvlášť. STM32 obmedzuje dĺžku polievania a dodržiava minimálnu prestávku medzi cyklami v oboch režimoch. Aplikácia pri pripojení synchronizuje čas. Rozprašovač sa vypne po dosiahnutí nastavenej vlhkosti, pri nedostatku vody alebo pri chybe merania. STM32 obmedzí dĺžku jedného cyklu a pred ďalším cyklom znova zmeria vlhkosť.
 
 ## Tím a úlohy
 
 | Člen tímu | Úlohy |
 | --- | --- |
-| Kiriienko Yehor | Zapojí snímače teploty, vlhkosti vzduchu a osvetlenia, ventilátor a LED. Naprogramuje meranie, riadenie ventilátora podľa teploty alebo časovača, ručné a časované ovládanie LED a UART na strane STM32. |
-| Ievgrafova Ievgeniia | Zapojí a skalibruje snímač vlhkosti pôdy. Zapojí čerpadlo a naprogramuje polievanie a ochranu proti preliatiu. Zostaví skleník a pripraví dokumentáciu. |
-| Rudenko Roman | Vytvorí grafickú aplikáciu v Pythone pre Windows. Cez UART zobrazí merania a stav zariadení, umožní nastaviť prahy a časovače a ručne zapnúť alebo vypnúť LED. Pripraví návod na spustenie aplikácie. |
+| Kiriienko Yehor | Zapojí snímače teploty, vlhkosti vzduchu a osvetlenia, ventilátor a LED. Naprogramuje meranie, riadenie ventilátora podľa teploty alebo časovača, ručné a časované ovládanie LED, riadenie rozprašovača podľa vlhkosti vzduchu a UART na strane STM32. |
+| Ievgrafova Ievgeniia | Zapojí a skalibruje snímač vlhkosti pôdy. Zapojí čerpadlo a naprogramuje polievanie a ochranu proti preliatiu. Zostaví skleník, osadí rozprašovač s nádržkou a pripraví dokumentáciu. |
+| Rudenko Roman | Vytvorí grafickú aplikáciu v Pythone pre Windows. Cez UART zobrazí merania a stav zariadení, umožní nastaviť prahy a časovače a ručne zapnúť alebo vypnúť LED a nastaviť požadovanú vlhkosť vzduchu. Zobrazí stav rozprašovača. Pripraví návod na spustenie aplikácie. |
 
 ## Postup
 
@@ -30,9 +31,9 @@ Režim sa volí pre každé zariadenie zvlášť. STM32 obmedzuje dĺžku poliev
 2. Zapojiť a overiť snímače a výstupy. Súbežne pripraviť rozhranie aplikácie.
 3. Skalibrovať snímač pôdy a naprogramovať prahové a časované režimy a ručné ovládanie LED.
 4. Zostaviť skleník a prepojiť aplikáciu so STM32.
-5. Otestovať oba režimy všetkých zariadení, prenos nastavení a ochranu proti preliatiu. Zaznamenať výsledky.
+5. V aplikácii overiť zobrazenie meraní a prenos nastavení do STM32. Vyskúšať čerpadlo podľa vlhkosti pôdy a časovača, ventilátor podľa teploty a časovača a LED ručne aj podľa časovača. Pri oboch režimoch polievania overiť maximálnu dĺžku chodu a minimálnu prestávku. Overiť zapnutie rozprašovača pri nízkej vlhkosti a jeho vypnutie pri dosiahnutí prahu alebo pri nedostatku vody. Zaznamenať výsledky.
 
-## Čo potrebujeme od univerzity
+## Čo potrebujeme
 
 Uvedené technické parametre sú orientačné. Možno použiť aj kompatibilné náhrady.
 
@@ -57,7 +58,12 @@ Uvedené technické parametre sú orientačné. Možno použiť aj kompatibilné
 | Prepojovacie vodiče Dupont | 30 ks | 10 M–M, 10 M–F, 10 F–F, dĺžka 20 cm. |
 | Rezistor 4,7 kΩ | 2 ks | Pre SDA a SCL. |
 | Rezistor 10 kΩ | 3 ks | Pre vstupy MOSFET modulov. |
+| Ultrazvukový rozprašovač | 1 sada | Grove Water Atomization alebo ekvivalent: 5 V DC, s riadiacou doskou a piezoelektrickým diskom. |
+| Napájací zdroj pre rozprašovač | 1 ks | Stabilizovaný 5 V DC / 1 A alebo viac, s vývodmi na svorky. |
+| Prevodník logických úrovní | 1 ks | Digitálny, 3,3 V → 5 V pre vstup EN modulu, napr. modul s 74AHCT125. |
+| Kábel Grove na Dupont | 1 ks | Pre 5 V, GND a EN. |
+| Plavákový snímač hladiny | 1 ks | Suchý kontakt pre 3,3 V vstup STM32, zopnutý pri dostatku vody. |
 | Multimeter | 1 ks | Na zapožičanie. |
 | Referenčný teplomer s vlhkomerom | 1 ks | Na zapožičanie. |
 
-Konštrukciu skleníka, nádrž na vodu a kvetináč si zabezpečí tím.
+Konštrukciu skleníka, nádrž na polievanie, nádržku na rozprašovač a kvetináč s podmiskou zabezpečí tím.
