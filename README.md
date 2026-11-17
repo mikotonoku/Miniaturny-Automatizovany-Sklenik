@@ -2,95 +2,62 @@
 
 ## Cieľ projektu
 
-Cieľom je navrhnúť a zostrojiť funkčný model malého skleníka. Riadiaca jednotka priebežne meria teplotu a vlhkosť vzduchu, vlhkosť pôdy a intenzitu osvetlenia. Podľa nameraných hodnôt automaticky ovláda ventilátor, zavlažovanie a doplnkové LED osvetlenie.
+Cieľom je navrhnúť a zostrojiť funkčný model automatizovaného skleníka.
 
-Používateľ môže sledovať aktuálne hodnoty a upravovať požadované medzné hodnoty. Súčasťou riešenia je kalibrácia snímačov, ochrana proti nadmernému zavlažovaniu a vyhodnotenie priebehu regulácie.
+STM32 meria teplotu a vlhkosť vzduchu, vlhkosť pôdy a osvetlenie. Aplikácia v Pythone pre Windows zobrazuje merania a stav zariadení a posiela nastavenia do STM32 cez UART (USB, virtuálny port COM).
 
-## Funkcie
+## Režimy riadenia
 
-- Meranie teploty a relatívnej vlhkosti vzduchu.
-- Meranie vlhkosti pôdy.
-- Meranie intenzity okolitého svetla.
-- Automatické osvetlenie: pri nedostatku svetla sa zapne LED osvetlenie.
-- Automatické vetranie: pri prekročení nastavenej teploty sa zapne ventilátor.
-- Automatické zavlažovanie: pri suchej pôde sa zapne čerpadlo.
-- Nastaviteľné prahové hodnoty a zobrazenie aktuálneho stavu.
-- Časový limit zavlažovania a minimálna pauza medzi cyklami ako ochrana proti preliatiu.
-- Kalibrácia snímača vlhkosti pôdy a overenie správnosti meraní.
-
-## Princíp riadenia
-
-| Meraná veličina | Podmienka | Reakcia systému |
+| Zariadenie | Prahový alebo ručný režim | Podľa časovača |
 | --- | --- | --- |
-| Osvetlenie | intenzita je pod nastaveným limitom | zapne sa LED osvetlenie |
-| Teplota | teplota je nad nastaveným limitom | zapne sa ventilátor |
-| Vlhkosť pôdy | vlhkosť je pod nastaveným limitom | na obmedzený čas sa zapne čerpadlo |
+| Čerpadlo | Zapne sa, keď vlhkosť pôdy klesne pod nastavenú hranicu. | Denný čas spustenia a dĺžka polievania. |
+| Ventilátor | Zapne sa pri prekročení nastavenej teploty. | Denný čas spustenia a dĺžka vetrania. |
+| LED | Ručné zapnutie a vypnutie v aplikácii. | Denný čas zapnutia a vypnutia. |
 
-## Tím a zodpovednosti
+Režim sa volí pre každé zariadenie zvlášť. STM32 obmedzuje dĺžku polievania a dodržiava minimálnu prestávku medzi cyklami v oboch režimoch. Aplikácia pri pripojení synchronizuje čas.
 
-| Člen tímu | Hlavná oblasť zodpovednosti |
+## Tím a úlohy
+
+| Člen tímu | Úlohy |
 | --- | --- |
-| **Kiriienko Yehor** | Pripojenie snímačov BME280, BH1750 a snímača vlhkosti pôdy; kalibrácia; zostavenie konštrukcie a umiestnenie snímačov; reálne merania a fotografie. |
-| **Ievgrafova Ievgeniia** | Pripojenie LED, MOSFET modulov, ventilátora a čerpadla; PWM riadenie a kontrola napájania; integračné testy; finálne spracovanie README, správy a prípadnej prezentácie. |
-| **Rudenko Roman** | Hlavný firmvér: I²C, ADC, PWM, získavanie meraní, algoritmus regulácie, hysterezia a ochrana proti nadmernému zavlažovaniu; správa zdrojového kódu v GitHube. |
+| Kiriienko Yehor | Zapojí snímače teploty, vlhkosti vzduchu a osvetlenia, ventilátor a LED. Naprogramuje meranie, riadenie ventilátora podľa teploty alebo časovača, ručné a časované ovládanie LED a UART na strane STM32. |
+| Ievgrafova Ievgeniia | Zapojí a skalibruje snímač vlhkosti pôdy. Zapojí čerpadlo a naprogramuje polievanie a ochranu proti preliatiu. Zostaví skleník a pripraví dokumentáciu. |
+| Rudenko Roman | Vytvorí grafickú aplikáciu v Pythone pre Windows. Cez UART zobrazí merania a stav zariadení, umožní nastaviť prahy a časovače a ručne zapnúť alebo vypnúť LED. Pripraví návod na spustenie aplikácie. |
 
-### Výstupy jednotlivých členov
+## Postup
 
-| Člen tímu | Povinné podklady pre výslednú dokumentáciu |
-| --- | --- |
-| **Kiriienko Yehor** | Schéma pripojenia snímačov, výsledky kalibrácie vlhkosti pôdy, fotografie konštrukcie a tabuľka reálnych nameraných hodnôt. |
-| **Ievgrafova Ievgeniia** | Schéma napájania a MOSFET zapojenia, výsledky bezpečnostných a integračných testov, finálne zjednotenie dokumentácie. |
-| **Rudenko Roman** | Pracovný kód, opis regulačného algoritmu, prahových hodnôt, hysterezie a ochrany proti preliatiu, záznamy z programu počas testov. |
+1. Dohodnúť zapojenie a formát správ UART.
+2. Zapojiť a overiť snímače a výstupy. Súbežne pripraviť rozhranie aplikácie.
+3. Skalibrovať snímač pôdy a naprogramovať prahové a časované režimy a ručné ovládanie LED.
+4. Zostaviť skleník a prepojiť aplikáciu so STM32.
+5. Otestovať oba režimy všetkých zariadení, prenos nastavení a ochranu proti preliatiu. Zaznamenať výsledky.
 
-### Postup práce v etapách
+## Čo potrebujeme od univerzity
 
-| Etapa | Kiriienko Yehor — snímače a konštrukcia | Ievgrafova Ievgeniia — aktuátory a dokumentácia | Rudenko Roman — firmvér |
-| --- | --- | --- | --- |
-| **1. Návrh** | Pripraví zapojenie a umiestnenie snímačov v modeli. | Navrhne napájanie a zapojenie MOSFET modulov, ventilátora, čerpadla a LED. | Pripraví projekt v STM32CubeIDE, repozitár GitHub a návrh regulačného algoritmu. |
-| **2. Samostatné moduly** | Pripojí BME280, BH1750 a snímač pôdy; overí namerané hodnoty. | Pripojí LED, ventilátor a čerpadlo cez MOSFET; overí PWM a bezpečné napájanie. | Implementuje I²C, ADC a PWM ovládače a spracovanie nameraných údajov. |
-| **3. Kalibrácia a regulácia** | Zmeria hodnoty snímača pôdy v suchej a mokrej pôde a vytvorí kalibračné údaje. | Overí pracovné režimy ventilátora a čerpadla a zaznamená bezpečné limity. | Implementuje prepočet ADC na vlhkosť, prahové hodnoty, hystereziu a časové obmedzenie zavlažovania. |
-| **4. Integrácia** | Umiestni snímače do konštrukcie a kontroluje správnosť meraní. | Zostaví fyzický model, kontroluje kabeláž a vykoná integračné testy aktuátorov. | Spojí moduly do jednej aplikácie: tma → LED, vysoká teplota → ventilátor, suchá pôda → zavlažovanie. |
-| **5. Testovanie** | Simuluje zmenu svetla, teploty a vlhkosti pôdy; zaznamenáva hodnoty a fotografie. | Kontroluje bezpečnosť a reakcie LED, ventilátora a čerpadla; zaznamenáva výsledky testov. | Analyzuje logy, opravuje chyby programu a overuje ochranu proti nadmernému zavlažovaniu. |
-| **6. Odovzdanie a obhajoba** | Dodá schémy, kalibračné údaje a fotografie. | Zjednotí README, správu a prípadnú prezentáciu. | Dodá finálny zdrojový kód a opis regulačného algoritmu. |
+Uvedené technické parametre sú orientačné. Možno použiť aj kompatibilné náhrady.
 
-## Potrebný hardvér
+| Položka | Počet | Požiadavka |
+| --- | ---: | --- |
+| STM32 NUCLEO-F303K8 | 1 ks | S osadenými pinovými lištami. |
+| Dátový USB kábel | 1 ks | USB-A → Micro-B, pre ST-LINK a virtuálny COM port. |
+| Modul BME280 | 1 ks | I²C, napájanie a logika 3,3 V, osadené piny. |
+| Modul BH1750 | 1 ks | I²C, napájanie a logika 3,3 V, osadené piny. |
+| Kapacitný snímač vlhkosti pôdy | 1 ks | DFRobot SEN0193 alebo ekvivalent s analógovým výstupom 0–3,0 V, vrátane 3-pinového kábla. |
+| Ventilátor | 1 ks | Dvojvodičový, 12 V DC, rozbehový prúd najviac 0,5 A. |
+| Biely LED pásik s prívodnými vodičmi | 1 ks | 12 V DC, dĺžka 25 cm, odber najviac 0,5 A. |
+| Mini ponorné čerpadlo | 1 ks | 12 V DC, rozbehový prúd najviac 1,5 A. |
+| Hadička k čerpadlu | 1 m | Vnútorný priemer podľa vývodu dodaného čerpadla. |
+| MOSFET spínací modul | 3 ks | Jednokanálový, aktívny pri logickej 1, vstup 3,3 V, záťaž 12 V DC, trvalý prúd aspoň 3 A, skrutkové svorky. |
+| Ochranná Schottkyho dióda | 2 ks | 1N5822, 3 A / 40 V, jedna pre čerpadlo a jedna pre ventilátor. |
+| Napájací adaptér | 1 ks | Stabilizovaný 12 V DC / 3 A, so zástrčkou DC 5,5 × 2,1 mm, plus v strede. |
+| Adaptér DC konektora na svorky | 1 ks | Zásuvka 5,5 × 2,1 mm na dvojpólovú skrutkovú svorku, aspoň 3 A. |
+| Rozbočovacia svorka | 2 ks | Päťpolohová, aspoň 3 A, pre kladnú a zápornú vetvu napájania. |
+| Napájací vodič | 4 m | Lanko 0,5 mm², 2 m červený a 2 m čierny. |
+| Breadboard | 1 ks | 830 kontaktov. |
+| Prepojovacie vodiče Dupont | 30 ks | 10 M–M, 10 M–F, 10 F–F, dĺžka 20 cm. |
+| Rezistor 4,7 kΩ | 2 ks | Pre SDA a SCL. |
+| Rezistor 10 kΩ | 3 ks | Pre vstupy MOSFET modulov. |
+| Multimeter | 1 ks | Na zapožičanie. |
+| Referenčný teplomer s vlhkomerom | 1 ks | Na zapožičanie. |
 
-| Položka | Počet | Rozhranie / riadenie | Účel | Zabezpečí |
-| --- | ---: | --- | --- | --- |
-| Vývojová doska STM32 Nucleo (napr. NUCLEO-F303K8) | 1 | — | hlavná riadiaca jednotka | univerzita |
-| BME280 | 1 | I²C | meranie teploty a relatívnej vlhkosti vzduchu | univerzita |
-| BH1750 | 1 | I²C | meranie intenzity okolitého svetla | univerzita |
-| Kapacitný snímač vlhkosti pôdy | 1 | ADC | meranie vlhkosti substrátu; kapacitná verzia je odolnejšia než odporová | univerzita |
-| LED alebo LED pásik pre rastliny | 1 | digitálny výstup alebo PWM | doplnkové osvetlenie | univerzita |
-| DC ventilátor 5 V / 12 V | 1 | PWM cez MOSFET | vetranie a možnosť regulácie otáčok | univerzita |
-| Mini ponorné DC čerpadlo s hadičkou | 1 | PWM cez MOSFET | zavlažovanie a možnosť regulácie výkonu | univerzita |
-| MOSFET moduly | 2 až 3 | ovládanie záťaží | bezpečné spínanie ventilátora, čerpadla a prípadne LED | univerzita |
-| Externý zdroj pre záťaže | 1 | — | napájanie čerpadla, ventilátora a LED podľa ich napätia | univerzita |
-| Dióda proti spätnému napätiu | 2 | pri DC motoroch | ochrana pri ventilátore a čerpadle | univerzita |
-| Rezistory, vodiče a breadboard | podľa potreby | — | prepojovacie a pomocné obvody | univerzita |
-| Nádoba na vodu, kvetináč, substrát a rastlina | 1 sada | — | fyzický model skleníka | tím má k dispozícii |
-| Konštrukcia skleníka | 1 | — | upevnenie LED, ventilátora a snímačov okolo rastliny | tím má k dispozícii |
-| USB kábel pre Nucleo | 1 | USB | programovanie a komunikácia s počítačom | univerzita |
-
-
-## Kalibrácia a testovanie
-
-1. Porovnať teplotu a vlhkosť vzduchu s referenčným teplomerom/vlhkomerom.
-2. Pre snímač pôdy zaznamenať hodnotu v suchej pôde a vo vlhkej pôde a z týchto hodnôt vytvoriť percentuálnu škálu.
-3. Overiť reakciu osvetlenia pri zakrytí snímača svetla.
-4. Overiť zapnutie a vypnutie ventilátora pri zmene teplotného prahu.
-5. Overiť automatické zavlažovanie v suchej pôde a maximálny čas činnosti čerpadla.
-6. Zaznamenať namerané hodnoty a stavy aktuátorov počas testu a vyhodnotiť stabilitu regulácie.
-
-## Softvér
-
-- STM32CubeIDE / STM32CubeMX
-- programovací jazyk C
-- Git a GitHub pre správu zdrojového kódu a dokumentácie
-
-## Plánovaný výstup
-
-- Funkčný fyzický model skleníka.
-- Zdrojový kód firmvéru a schéma zapojenia v tomto repozitári.
-- Popis kalibrácie, testovacie výsledky a stručné vyhodnotenie regulácie.
-- Prezentácia a praktická ukážka funkcií systému.
+Konštrukciu skleníka, nádrž na vodu a kvetináč si zabezpečí tím.
